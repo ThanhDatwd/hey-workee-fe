@@ -17,7 +17,7 @@ interface NavigationProps {
   userType?: 'customer' | 'worker' | null;
 }
 
-export function Navigation({ userType }: NavigationProps) {
+function Navigation({ userType }: NavigationProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
 

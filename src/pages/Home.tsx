@@ -13,7 +13,7 @@ import {
   Smartphone,
   ArrowRight
 } from "lucide-react";
-import { Navigation } from "@/components/Navigation";
+import Navigation from "@/components/Navigation";
 
 const services = [
   {
