@@ -15,6 +15,8 @@ import WorkerDashboard from "./pages/WorkerDashboard";
 import WorkerRequests from "./pages/WorkerRequests";
 import SendQuote from "./pages/SendQuote";
 import WorkerJobs from "./pages/WorkerJobs";
+import Profile from "./pages/Profile";
+import WorkerProfile from "./pages/WorkerProfile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -38,6 +40,8 @@ const App = () => (
           <Route path="/worker-requests" element={<WorkerRequests />} />
           <Route path="/send-quote" element={<SendQuote />} />
           <Route path="/worker-jobs" element={<WorkerJobs />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/worker-profile" element={<WorkerProfile />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

@@ -29,10 +29,10 @@ function Navigation({ userType }: NavigationProps) {
   ];
 
   const workerMenuItems = [
-    { icon: Home, label: "Trang chủ", path: "/worker" },
-    { icon: List, label: "Yêu cầu gần đây", path: "/worker/requests" },
-    { icon: Settings, label: "Đơn hàng", path: "/worker/orders" },
-    { icon: User, label: "Tài khoản", path: "/worker/profile" },
+    { icon: Home, label: "Trang chủ", path: "/worker-dashboard" },
+    { icon: List, label: "Yêu cầu gần đây", path: "/worker-requests" },
+    { icon: Settings, label: "Đơn hàng", path: "/worker-jobs" },
+    { icon: User, label: "Tài khoản", path: "/worker-profile" },
   ];
 
   const menuItems = userType === 'worker' ? workerMenuItems : customerMenuItems;
