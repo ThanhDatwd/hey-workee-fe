@@ -134,7 +134,7 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl lg:text-4xl font-bold mb-4">
-              Tại sao chọn ThợGần?
+              Tại sao chọn Thợ Ơiii?
             </h2>
           </div>
           

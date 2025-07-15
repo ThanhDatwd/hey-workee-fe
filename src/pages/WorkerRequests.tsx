@@ -5,16 +5,32 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import Navigation from "@/components/Navigation";
 
 const WorkerRequests = () => {
   const [selectedService, setSelectedService] = useState("all");
   const [selectedDistance, setSelectedDistance] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
+  const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false);
+  const [selectedRequestId, setSelectedRequestId] = useState(null);
+  const [quoteData, setQuoteData] = useState({
+    amount: "",
+    estimatedTime: "",
+    note: ""
+  });
 
   const services = [
-    "Sửa điện", "Sửa nước", "Vệ sinh điều hòa", "Sửa máy giặt", 
-    "Thông tắc cống", "Lắp đặt thiết bị", "Sơn nhà", "Khác"
+    "Sửa điện",
+    "Sửa nước",
+    "Vệ sinh điều hòa",
+    "Sửa máy giặt",
+    "Thông tắc cống",
+    "Lắp đặt thiết bị",
+    "Sơn nhà",
+    "Khác"
   ];
 
   const requests = [
@@ -36,7 +52,7 @@ const WorkerRequests = () => {
       description: "Vòi nước bể rửa chén bị rò rỉ, nước chảy liên tục",
       customer: "Chị Lan",
       location: "456 Lê Lợi, Quận 3, TP.HCM",
-      distance: "1.5km", 
+      distance: "1.5km",
       time: "25 phút trước",
       urgent: false,
       budget: "100,000 - 300,000đ",
@@ -68,17 +84,62 @@ const WorkerRequests = () => {
     }
   ];
 
-  const filteredRequests = requests.filter(request => {
+  const filteredRequests = requests.filter((request) => {
     const matchesService = selectedService === "all" || request.service === selectedService;
-    const matchesSearch = request.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         request.customer.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch =
+      request.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      request.customer.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesService && matchesSearch;
   });
+
+  const handleOpenQuoteModal = (requestId) => {
+    setSelectedRequestId(requestId);
+    setIsQuoteModalOpen(true);
+  };
+
+  const handleCloseQuoteModal = () => {
+    setIsQuoteModalOpen(false);
+    setSelectedRequestId(null);
+    setQuoteData({ amount: "", estimatedTime: "", note: "" });
+  };
+
+  const handleQuoteChange = (e) => {
+    const { name, value } = e.target;
+    setQuoteData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmitQuote = async () => {
+    if (!quoteData.amount || !quoteData.estimatedTime) {
+      alert("Vui lòng nhập đầy đủ số tiền và thời gian hoàn thành!");
+      return;
+    }
+
+    // Giả lập gửi báo giá (thay bằng gọi API thực tế nếu có)
+    try {
+      console.log("Gửi báo giá cho yêu cầu ID:", selectedRequestId, quoteData);
+      // Ví dụ gọi API:
+      /*
+      await fetch('/api/quotes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          requestId: selectedRequestId,
+          workerId: 1, // Giả định ID thợ
+          ...quoteData
+        })
+      });
+      */
+      alert("Báo giá đã được gửi!");
+      handleCloseQuoteModal();
+    } catch (error) {
+      alert("Lỗi khi gửi báo giá: " + error.message);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-secondary/20">
       <Navigation userType="worker" />
-      
+
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
@@ -108,7 +169,6 @@ const WorkerRequests = () => {
                   />
                 </div>
               </div>
-              
               <div>
                 <label className="text-sm font-medium mb-2 block">Dịch vụ</label>
                 <Select value={selectedService} onValueChange={setSelectedService}>
@@ -123,7 +183,6 @@ const WorkerRequests = () => {
                   </SelectContent>
                 </Select>
               </div>
-
               <div>
                 <label className="text-sm font-medium mb-2 block">Khoảng cách</label>
                 <Select value={selectedDistance} onValueChange={setSelectedDistance}>
@@ -194,7 +253,10 @@ const WorkerRequests = () => {
                     <Eye className="w-4 h-4 mr-2" />
                     Xem chi tiết
                   </Button>
-                  <Button className="flex-1 md:flex-none">
+                  <Button
+                    className="flex-1 md:flex-none"
+                    onClick={() => handleOpenQuoteModal(request.id)}
+                  >
                     Gửi báo giá
                   </Button>
                 </div>
@@ -211,6 +273,56 @@ const WorkerRequests = () => {
             </CardContent>
           </Card>
         )}
+
+        {/* Quote Modal */}
+        <Dialog open={isQuoteModalOpen} onOpenChange={setIsQuoteModalOpen}>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Gửi báo giá</DialogTitle>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="amount">Số tiền (VND)</Label>
+                <Input
+                  id="amount"
+                  name="amount"
+                  type="number"
+                  placeholder="Nhập số tiền"
+                  value={quoteData.amount}
+                  onChange={handleQuoteChange}
+                  required
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="estimatedTime">Thời gian hoàn thành</Label>
+                <Input
+                  id="estimatedTime"
+                  name="estimatedTime"
+                  placeholder="Ví dụ: 2 giờ, 1 ngày..."
+                  value={quoteData.estimatedTime}
+                  onChange={handleQuoteChange}
+                  required
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="note">Ghi chú</Label>
+                <Textarea
+                  id="note"
+                  name="note"
+                  placeholder="Thêm ghi chú cho báo giá..."
+                  value={quoteData.note}
+                  onChange={handleQuoteChange}
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={handleCloseQuoteModal}>
+                Hủy
+              </Button>
+              <Button onClick={handleSubmitQuote}>Gửi báo giá</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

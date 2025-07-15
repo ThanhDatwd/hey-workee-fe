@@ -24,7 +24,7 @@ export default function Login() {
             </div>
             <h1 className="text-3xl font-bold">Đăng nhập</h1>
             <p className="text-muted-foreground mt-2">
-              Chào mừng trở lại với ThợGần
+              Chào mừng trở lại với Thợ Ơiii
             </p>
           </div>
 
