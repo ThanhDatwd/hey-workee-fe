@@ -162,4 +162,6 @@ export function Navigation({ userType }: NavigationProps) {
       </nav>
     </>
   );
-}
+};
+
+export default Navigation;

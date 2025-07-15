@@ -11,6 +11,10 @@ import WaitingResponse from "./pages/WaitingResponse";
 import Quotes from "./pages/Quotes";
 import JobTracking from "./pages/JobTracking";
 import MyRequests from "./pages/MyRequests";
+import WorkerDashboard from "./pages/WorkerDashboard";
+import WorkerRequests from "./pages/WorkerRequests";
+import SendQuote from "./pages/SendQuote";
+import WorkerJobs from "./pages/WorkerJobs";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,6 +34,10 @@ const App = () => (
           <Route path="/quotes" element={<Quotes />} />
           <Route path="/job-tracking" element={<JobTracking />} />
           <Route path="/my-requests" element={<MyRequests />} />
+          <Route path="/worker-dashboard" element={<WorkerDashboard />} />
+          <Route path="/worker-requests" element={<WorkerRequests />} />
+          <Route path="/send-quote" element={<SendQuote />} />
+          <Route path="/worker-jobs" element={<WorkerJobs />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
