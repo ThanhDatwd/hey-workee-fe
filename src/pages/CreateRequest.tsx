@@ -165,7 +165,7 @@ export default function CreateRequest() {
       });
 
       console.log("Fetched services:", response);
-      const data = response||[];
+      const data = Array.isArray(response) ? response : [];
       setServices(data)
     } catch (error) {
       console.error("Error fetching services:", error);
@@ -181,16 +181,16 @@ export default function CreateRequest() {
     <div className="min-h-screen bg-background">
       <Navigation userType="customer" />
 
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-3xl mx-auto">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold mb-2">Tạo yêu cầu công việc</h1>
-            <p className="text-muted-foreground">
-              Mô tả chi tiết công việc để nhận được báo giá chính xác nhất
-            </p>
-          </div>
+      <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8">
+          <div className="max-w-3xl mx-auto">
+            <div className="text-center mb-6 px-2">
+              <h1 className="text-2xl sm:text-3xl font-bold mb-2">Tạo yêu cầu công việc</h1>
+              <p className="text-muted-foreground text-sm sm:text-base">
+                Mô tả chi tiết công việc để nhận được báo giá chính xác nhất
+              </p>
+            </div>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 sm:space-y-8">
             {/* Service Selection */}
             <Card className="shadow-soft">
               <CardHeader>
@@ -201,23 +201,23 @@ export default function CreateRequest() {
                 <CardDescription>Chọn dịch vụ phù hợp với nhu cầu của bạn</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   {services.map((service) => (
                     <div
                       key={service.id}
                       onClick={() => setValue("serviceId", service.id)}
                       className={`
-                        p-4 border-2 rounded-lg cursor-pointer transition-all hover:shadow-soft
+                        p-3 sm:p-4 border-2 rounded-lg cursor-pointer transition-all hover:shadow-soft
                         ${selectedService === service.id ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"}
                       `}
                     >
-                      <div className="flex items-start gap-3">
-                        <div className={`w-12 h-12 rounded-xl bg-yellow-100 text-yellow-600 flex items-center justify-center flex-shrink-0`}>
-                          <Zap className="w-6 h-6" />
+                      <div className="flex items-start gap-2 sm:gap-3">
+                        <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-yellow-100 text-yellow-600 flex items-center justify-center flex-shrink-0`}>
+                          <Zap className="w-5 h-5 sm:w-6 sm:h-6" />
                         </div>
                         <div className="flex-1">
                           <h3
-                            className={`font-semibold mb-2 ${
+                            className={`font-semibold mb-1 sm:mb-2 text-sm sm:text-base ${
                               selectedService === service.id ? "text-primary" : "text-foreground"
                             }`}
                           >
@@ -281,9 +281,9 @@ export default function CreateRequest() {
 
                 <div className="space-y-2">
                   <Label>Hình ảnh hoặc video (tuỳ chọn)</Label>
-                  <div className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary/50 transition-colors">
-                    <Camera className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-                    <p className="text-sm text-muted-foreground mb-2">
+                  <div className="border-2 border-dashed border-border rounded-lg p-4 sm:p-6 text-center hover:border-primary/50 transition-colors">
+                    <Camera className="w-6 h-6 sm:w-8 sm:h-8 text-muted-foreground mx-auto mb-2" />
+                    <p className="text-xs sm:text-sm text-muted-foreground mb-2">
                       Chụp ảnh hoặc quay video để thợ hiểu rõ hơn về vấn đề
                     </p>
                     <input
@@ -303,20 +303,20 @@ export default function CreateRequest() {
                   </div>
 
                   {media.length > 0 && (
-                    <div className="grid grid-cols-3 gap-2 mt-4">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-4">
                       {media.map((item, index) => (
                         <div key={index} className="relative group">
                           {item.type === "image" ? (
                             <img
                               src={item.url}
                               alt={`Preview ${index + 1}`}
-                              className="w-full h-20 object-cover rounded-lg"
+                              className="w-full h-16 sm:h-20 object-cover rounded-lg"
                             />
                           ) : (
                             <video
                               src={item.url}
                               controls
-                              className="w-full h-20 object-cover rounded-lg"
+                              className="w-full h-16 sm:h-20 object-cover rounded-lg"
                             />
                           )}
                           <Button
@@ -351,7 +351,7 @@ export default function CreateRequest() {
                     id="address"
                     placeholder="Số nhà, tên đường, phường/xã, quận/huyện, thành phố"
                     {...register("address")}
-                    className="h-12"
+                    className="h-10 sm:h-12"
                   />
                   {errors.address && (
                     <p className="text-sm text-red-500">{errors.address.message}</p>
@@ -387,7 +387,7 @@ export default function CreateRequest() {
                   <div className="text-sm text-red-500">{locationError}</div>
                 )}
 
-                <Button type="button" variant="outline" className="w-full" onClick={handleGetLocation}>
+                <Button type="button" variant="outline" className="w-full h-10 sm:h-auto text-sm sm:text-base" onClick={handleGetLocation}>
                   <MapPin className="w-4 h-4 mr-2" />
                   Sử dụng vị trí hiện tại
                 </Button>
@@ -397,21 +397,21 @@ export default function CreateRequest() {
             {/* Submit Button */}
             <Card className="shadow-soft">
               <CardContent className="pt-6">
-                <div className="flex flex-col sm:flex-row gap-4 justify-end">
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-end">
                   <Button
                     type="button"
                     variant="outline"
                     onClick={() => navigate("/")}
-                    className="sm:w-auto"
+                    className="sm:w-auto h-10 sm:h-auto text-sm sm:text-base"
                   >
                     Huỷ bỏ
                   </Button>
-                  <Button type="submit" disabled={isSubmitting} className="sm:w-auto">
+                  <Button type="submit" disabled={isSubmitting} className="sm:w-auto h-10 sm:h-auto text-sm sm:text-base">
                     {isSubmitting ? "Đang gửi..." : "Gửi yêu cầu"}
                   </Button>
                 </div>
 
-                <p className="text-sm text-muted-foreground mt-4 text-center">
+                <p className="text-xs sm:text-sm text-muted-foreground mt-3 sm:mt-4 text-center px-2">
                   Sau khi gửi yêu cầu, hệ thống sẽ tự động tìm thợ phù hợp trong khu vực của bạn
                 </p>
               </CardContent>
