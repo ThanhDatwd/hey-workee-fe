@@ -178,21 +178,21 @@ export default function CreateRequest() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-muted/30">
       <Navigation userType="customer" />
 
-      <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8">
-          <div className="max-w-3xl mx-auto">
+      <div className="container mx-auto px-4 py-6 max-w-md lg:max-w-3xl">
+          <div className="lg:max-w-3xl lg:mx-auto">
             <div className="text-center mb-6 px-2">
-              <h1 className="text-2xl sm:text-3xl font-bold mb-2">Tạo yêu cầu công việc</h1>
-              <p className="text-muted-foreground text-sm sm:text-base">
+              <h1 className="text-2xl lg:text-3xl font-bold mb-2 text-foreground">Tạo yêu cầu công việc</h1>
+              <p className="text-muted-foreground text-sm lg:text-base">
                 Mô tả chi tiết công việc để nhận được báo giá chính xác nhất
               </p>
             </div>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 sm:space-y-8">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 lg:space-y-8">
             {/* Service Selection */}
-            <Card className="shadow-soft">
+            <Card className="shadow-medium border-0 lg:border lg:shadow-soft">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <CheckCircle className="w-5 h-5 text-primary" />
@@ -201,23 +201,23 @@ export default function CreateRequest() {
                 <CardDescription>Chọn dịch vụ phù hợp với nhu cầu của bạn</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                <div className="grid grid-cols-1 gap-3 lg:grid-cols-2 lg:gap-4">
                   {services.map((service) => (
                     <div
                       key={service.id}
                       onClick={() => setValue("serviceId", service.id)}
                       className={`
-                        p-3 sm:p-4 border-2 rounded-lg cursor-pointer transition-all hover:shadow-soft
-                        ${selectedService === service.id ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"}
+                        p-4 border-2 rounded-xl cursor-pointer transition-all hover:shadow-medium lg:p-4
+                        ${selectedService === service.id ? "border-primary bg-primary/10 shadow-soft" : "border-border hover:border-primary/50"}
                       `}
                     >
-                      <div className="flex items-start gap-2 sm:gap-3">
-                        <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-yellow-100 text-yellow-600 flex items-center justify-center flex-shrink-0`}>
-                          <Zap className="w-5 h-5 sm:w-6 sm:h-6" />
+                      <div className="flex items-start gap-3">
+                        <div className={`w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center flex-shrink-0`}>
+                          <Zap className="w-6 h-6" />
                         </div>
                         <div className="flex-1">
                           <h3
-                            className={`font-semibold mb-1 sm:mb-2 text-sm sm:text-base ${
+                            className={`font-semibold mb-2 text-base lg:text-base ${
                               selectedService === service.id ? "text-primary" : "text-foreground"
                             }`}
                           >
@@ -257,7 +257,7 @@ export default function CreateRequest() {
             </Card>
 
             {/* Job Description */}
-            <Card className="shadow-soft">
+            <Card className="shadow-medium border-0 lg:border lg:shadow-soft">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <CheckCircle className="w-5 h-5 text-primary" />
@@ -336,7 +336,7 @@ export default function CreateRequest() {
             </Card>
 
             {/* Location */}
-            <Card className="shadow-soft">
+            <Card className="shadow-medium border-0 lg:border lg:shadow-soft">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <MapPin className="w-5 h-5 text-primary" />
@@ -395,18 +395,18 @@ export default function CreateRequest() {
             </Card>
 
             {/* Submit Button */}
-            <Card className="shadow-soft">
+            <Card className="shadow-medium border-0 lg:border lg:shadow-soft">
               <CardContent className="pt-6">
-                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-end">
+                <div className="flex flex-col gap-3 lg:flex-row lg:gap-4 lg:justify-end">
                   <Button
                     type="button"
                     variant="outline"
                     onClick={() => navigate("/")}
-                    className="sm:w-auto h-10 sm:h-auto text-sm sm:text-base"
+                    className="w-full lg:w-auto h-12 lg:h-auto text-base lg:text-sm font-medium"
                   >
                     Huỷ bỏ
                   </Button>
-                  <Button type="submit" disabled={isSubmitting} className="sm:w-auto h-10 sm:h-auto text-sm sm:text-base">
+                  <Button type="submit" disabled={isSubmitting} className="w-full lg:w-auto h-12 lg:h-auto text-base lg:text-sm font-medium">
                     {isSubmitting ? "Đang gửi..." : "Gửi yêu cầu"}
                   </Button>
                 </div>
