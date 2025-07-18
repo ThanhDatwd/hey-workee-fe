@@ -49,7 +49,7 @@ function Navigation({ userType }: NavigationProps) {
               <Wrench className="w-5 h-5 text-primary-foreground" />
             </div>
             <span className="font-semibold text-lg text-foreground">
-              ThợGần
+              Thợ Ơiii
             </span>
           </Link>
           
@@ -108,7 +108,7 @@ function Navigation({ userType }: NavigationProps) {
               <Wrench className="w-6 h-6 text-primary-foreground" />
             </div>
             <span className="font-bold text-xl text-foreground">
-              ThợGần
+              Thợ Ơiii
             </span>
           </Link>
 

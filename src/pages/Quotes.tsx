@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -15,6 +15,7 @@ import {
   Timer,
   Award
 } from "lucide-react";
+import { quoteService } from "@/services/quoteService";
 
 interface Quote {
   id: string;
@@ -94,7 +95,10 @@ const mockQuotes: Quote[] = [
 
 export default function Quotes() {
   const navigate = useNavigate();
+   const {requestId} = useParams();
   const [selectedQuote, setSelectedQuote] = useState<string | null>(null);
+  const [quotes, setQuotes] = useState<Quote[]>(mockQuotes);
+  
 
   const handleSelectWorker = (quoteId: string) => {
     setSelectedQuote(quoteId);
@@ -110,6 +114,27 @@ export default function Quotes() {
       currency: 'VND'
     }).format(price);
   };
+
+  const fetchQoutes = async () => {
+    try {
+      const response = await quoteService.getQuotesByReQuest({
+        requestId: requestId || '',
+        pageSize: 10,
+        pageNumber: 1,
+        filter: {}
+      });
+      console.log("Quotes fetched successfully:", response.data);
+      const data = response.data|| [];
+      setQuotes(data);
+    } catch (error) {
+      console.error("Error fetching quotes:", error);
+      // Handle error appropriately, e.g., show a toast notification
+      
+    }
+  }
+  useEffect(() => {
+    fetchQoutes();
+  }, [requestId]);
 
   return (
     <div className="min-h-screen bg-background">

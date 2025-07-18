@@ -60,7 +60,7 @@ export default function Register() {
             </div>
             <h1 className="text-3xl font-bold">Đăng ký tài khoản</h1>
             <p className="text-muted-foreground mt-2">
-              Tham gia cộng đồng ThợGần ngay hôm nay
+              Tham gia cộng đồng Thợ Ơiii ngay hôm nay
             </p>
           </div>
 
@@ -275,7 +275,7 @@ export default function Register() {
                   <Link to="/privacy" className="text-primary hover:underline">
                     Chính sách bảo mật
                   </Link>{" "}
-                  của ThợGần
+                  của Thợ Ơiii
                 </Label>
               </div>
 

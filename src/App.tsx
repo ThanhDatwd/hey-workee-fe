@@ -33,7 +33,7 @@ const App = () => (
           <Route path="/register" element={<Register />} />
           <Route path="/create-request" element={<CreateRequest />} />
           <Route path="/waiting-response" element={<WaitingResponse />} />
-          <Route path="/quotes" element={<Quotes />} />
+          <Route path="/quotes/:requestId" element={<Quotes />} />
           <Route path="/job-tracking" element={<JobTracking />} />
           <Route path="/my-requests" element={<MyRequests />} />
           <Route path="/worker-dashboard" element={<WorkerDashboard />} />
