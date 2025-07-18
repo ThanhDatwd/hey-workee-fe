@@ -1,5 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useForm, SubmitHandler } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -7,77 +10,177 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Navigation from "@/components/Navigation";
-import { 
-  Zap, 
-  Droplet, 
-  Wind, 
-  Wrench, 
-  MapPin, 
-  Camera, 
-  Upload,
-  X,
-  CheckCircle
-} from "lucide-react";
+import { Zap, Droplet, Wind, Wrench, MapPin, Camera, Upload, X, CheckCircle } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { jobServiceService } from "@/services/serviceService";
+import { jobService } from "@/services/jobService";
 
-const services = [
-  { 
-    id: 'electric', 
-    name: 'Sửa điện', 
-    icon: Zap, 
-    color: 'bg-yellow-100 text-yellow-600',
-    examples: ['Thay bóng đèn', 'Sửa ổ cắm', 'Lắp quạt trần', 'Sửa cầu dao']
-  },
-  { 
-    id: 'plumbing', 
-    name: 'Sửa nước', 
-    icon: Droplet, 
-    color: 'bg-blue-100 text-blue-600',
-    examples: ['Sửa vòi nước', 'Thông tắc cống', 'Lắp bồn cầu', 'Sửa máy bơm']
-  },
-  { 
-    id: 'ac', 
-    name: 'Điều hòa', 
-    icon: Wind, 
-    color: 'bg-green-100 text-green-600',
-    examples: ['Vệ sinh điều hòa', 'Sửa máy lạnh', 'Nạp gas', 'Lắp đặt mới']
-  },
-  { 
-    id: 'general', 
-    name: 'Sửa chữa tổng hợp', 
-    icon: Wrench, 
-    color: 'bg-purple-100 text-purple-600',
-    examples: ['Sửa tủ bếp', 'Lắp kệ', 'Sửa cửa', 'Sơn tường']
-  },
-];
+
+
+const CUSTOMER_ID="409dd430-11cf-4f86-bccf-ee4ef5e6e6e1"
+// Định nghĩa interface cho service
+interface Service {
+  id: string;
+  name: string;
+  icon: React.ComponentType<{ className?: string }>;
+  description: string;
+  imageUrl: string;
+}
+
+// Định nghĩa interface cho media
+interface Media {
+  file: File;
+  url: string;
+  type: "image" | "video";
+}
+
+// Định nghĩa schema validation với zod
+const jobRequestSchema = z.object({
+  serviceId: z.string().min(1, "Vui lòng chọn loại dịch vụ"),
+  description: z.string().min(1, "Vui lòng nhập mô tả công việc"),
+  address: z.string().optional(),
+  locationLat: z.number().nullable().optional(),
+  locationLng: z.number().nullable().optional(),
+  media: z.array(z.string()).optional(),
+  radius: z.number().min(1, "Bán kính phải lớn hơn 0").default(5),
+});
+
+type JobRequestForm = z.infer<typeof jobRequestSchema>;
 
 export default function CreateRequest() {
   const navigate = useNavigate();
-  const [selectedService, setSelectedService] = useState<string>('');
-  const [description, setDescription] = useState('');
-  const [address, setAddress] = useState('');
-  const [images, setImages] = useState<string[]>([]);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [media, setMedia] = useState<Media[]>([]);
+  const [locationError, setLocationError] = useState<string>("");
+  const [services, setServices] = useState<Service[]>([]);
 
-  const handleSubmit = async () => {
-    if (!selectedService || !description || !address) {
+  // Khởi tạo form với react-hook-form và zod
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors, isSubmitting },
+  } = useForm<JobRequestForm>({
+    resolver: zodResolver(jobRequestSchema),
+    defaultValues: {
+      serviceId: "",
+      description: "",
+      address: "",
+      locationLat: null,
+      locationLng: null,
+      radius: 5,
+      media: [],
+    },
+  });
+
+  const selectedService = watch("serviceId");
+  const selectedServiceData = services.find((s) => s.id === selectedService);
+
+  // Xử lý upload file (hình ảnh hoặc video)
+  const handleMediaUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    const validImageTypes = ["image/jpeg", "image/png", "image/gif"];
+    const validVideoTypes = ["video/mp4", "video/mov"];
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    const maxFiles = 5; // Tối đa 5 file
+
+    if (media.length + files.length > maxFiles) {
+      alert(`Tối đa chỉ được upload ${maxFiles} file!`);
       return;
     }
 
-    setIsSubmitting(true);
-    
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false);
-      navigate('/waiting-response');
-    }, 2000);
+    const newMedia: Media[] = files
+      .filter((file) => {
+        if (file.size > maxSize) {
+          alert(`File ${file.name} vượt quá kích thước 10MB!`);
+          return false;
+        }
+        return validImageTypes.includes(file.type) || validVideoTypes.includes(file.type);
+      })
+      .map((file: File) => ({
+        file,
+        url: URL.createObjectURL(file),
+        type: file.type.startsWith("image") ? ("image" as const) : ("video" as const),
+      }));
+
+    setMedia((prev) => [...prev, ...newMedia]);
+    setValue("media", [...media, ...newMedia].map((m) => m.url));
   };
 
-  const selectedServiceData = services.find(s => s.id === selectedService);
+  // Xử lý xóa media
+  const handleRemoveMedia = (index: number) => {
+    setMedia((prev) => prev.filter((_, i) => i !== index));
+    setValue("media", media.filter((_, i) => i !== index).map((m) => m.url));
+  };
+
+  // Lấy vị trí hiện tại
+  const handleGetLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setValue("locationLat", position.coords.latitude);
+          setValue("locationLng", position.coords.longitude);
+          setLocationError("");
+        },
+        (error) => {
+          setLocationError("Không thể lấy vị trí. Vui lòng nhập địa chỉ thủ công.");
+          console.error("Geolocation error:", error);
+        }
+      );
+    } else {
+      setLocationError("Trình duyệt không hỗ trợ định vị.");
+    }
+  };
+
+  // Gửi yêu cầu công việc
+  const onSubmit: SubmitHandler<JobRequestForm> = async (data) => {
+    // Chuẩn bị dữ liệu gửi API
+  const jobRequest = {
+      customerId: CUSTOMER_ID,
+      serviceId: data.serviceId,
+      description: data.description,
+      locationLat: data.locationLat,
+      locationLng: data.locationLng,
+      address: data.address,
+      radius: data.radius,
+    }
+    try {
+      // Gọi API (dựa trên code Spring Boot)
+      const response = await jobService.createJobRequest(jobRequest);
+
+
+      navigate("/waiting-response");
+    } catch (error) {
+      alert("Lỗi khi gửi yêu cầu: " + (error as Error).message);
+    }
+  };
+
+    // fetch services from API
+
+  const fetchServices = async () => {
+    try {
+      const response = await jobServiceService.getAll({
+        pageSize: 100,
+        pageNumber: 1,
+      });
+
+      console.log("Fetched services:", response);
+      const data = response||[];
+      setServices(data)
+    } catch (error) {
+      console.error("Error fetching services:", error);
+      return [];
+    }
+  };
+
+  useEffect(() => {
+    fetchServices();
+  }, []);
 
   return (
     <div className="min-h-screen bg-background">
       <Navigation userType="customer" />
-      
+
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-8">
@@ -87,7 +190,7 @@ export default function CreateRequest() {
             </p>
           </div>
 
-          <div className="space-y-8">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
             {/* Service Selection */}
             <Card className="shadow-soft">
               <CardHeader>
@@ -95,59 +198,61 @@ export default function CreateRequest() {
                   <CheckCircle className="w-5 h-5 text-primary" />
                   Chọn loại dịch vụ
                 </CardTitle>
-                <CardDescription>
-                  Chọn dịch vụ phù hợp với nhu cầu của bạn
-                </CardDescription>
+                <CardDescription>Chọn dịch vụ phù hợp với nhu cầu của bạn</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {services.map((service) => (
                     <div
                       key={service.id}
-                      onClick={() => setSelectedService(service.id)}
+                      onClick={() => setValue("serviceId", service.id)}
                       className={`
                         p-4 border-2 rounded-lg cursor-pointer transition-all hover:shadow-soft
-                        ${selectedService === service.id
-                          ? 'border-primary bg-primary/5'
-                          : 'border-border hover:border-primary/50'
-                        }
+                        ${selectedService === service.id ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"}
                       `}
                     >
                       <div className="flex items-start gap-3">
-                        <div className={`w-12 h-12 rounded-xl ${service.color} flex items-center justify-center flex-shrink-0`}>
-                          <service.icon className="w-6 h-6" />
+                        <div className={`w-12 h-12 rounded-xl bg-yellow-100 text-yellow-600 flex items-center justify-center flex-shrink-0`}>
+                          <Zap className="w-6 h-6" />
                         </div>
                         <div className="flex-1">
-                          <h3 className={`font-semibold mb-2 ${
-                            selectedService === service.id ? 'text-primary' : 'text-foreground'
-                          }`}>
+                          <h3
+                            className={`font-semibold mb-2 ${
+                              selectedService === service.id ? "text-primary" : "text-foreground"
+                            }`}
+                          >
                             {service.name}
                           </h3>
                           <div className="flex flex-wrap gap-1">
-                            {service.examples.slice(0, 2).map((example, index) => (
-                              <Badge key={index} variant="secondary" className="text-xs">
-                                {example}
+                              <Badge variant="secondary" className="text-xs">
+                                {service.description}
                               </Badge>
-                            ))}
                           </div>
                         </div>
                       </div>
                     </div>
                   ))}
                 </div>
-                
-                {selectedServiceData && (
+                {errors.serviceId && (
+                  <p className="text-sm text-red-500 mt-2">{errors.serviceId.message}</p>
+                )}
+
+                {/* {selectedServiceData && (
                   <div className="mt-4 p-4 bg-accent/50 rounded-lg">
                     <h4 className="font-medium mb-2">Các công việc phổ biến:</h4>
                     <div className="flex flex-wrap gap-2">
                       {selectedServiceData.examples.map((example, index) => (
-                        <Badge key={index} variant="outline" className="cursor-pointer hover:bg-primary hover:text-primary-foreground">
+                        <Badge
+                          key={index}
+                          variant="outline"
+                          className="cursor-pointer hover:bg-primary hover:text-primary-foreground"
+                        >
                           {example}
                         </Badge>
                       ))}
                     </div>
                   </div>
-                )}
+                )} */}
               </CardContent>
             </Card>
 
@@ -158,9 +263,7 @@ export default function CreateRequest() {
                   <CheckCircle className="w-5 h-5 text-primary" />
                   Mô tả công việc
                 </CardTitle>
-                <CardDescription>
-                  Mô tả chi tiết vấn đề và yêu cầu của bạn
-                </CardDescription>
+                <CardDescription>Mô tả chi tiết vấn đề và yêu cầu của bạn</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
@@ -168,40 +271,59 @@ export default function CreateRequest() {
                   <Textarea
                     id="description"
                     placeholder="Ví dụ: Bóng đèn phòng khách bị chập chờn, cần thay mới. Trần nhà cao khoảng 3m..."
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    rows={4}
+                    {...register("description")}
                     className="resize-none"
                   />
+                  {errors.description && (
+                    <p className="text-sm text-red-500">{errors.description.message}</p>
+                  )}
                 </div>
-                
+
                 <div className="space-y-2">
-                  <Label>Hình ảnh (tuỳ chọn)</Label>
+                  <Label>Hình ảnh hoặc video (tuỳ chọn)</Label>
                   <div className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary/50 transition-colors">
                     <Camera className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
                     <p className="text-sm text-muted-foreground mb-2">
-                      Chụp ảnh để thợ hiểu rõ hơn về vấn đề
+                      Chụp ảnh hoặc quay video để thợ hiểu rõ hơn về vấn đề
                     </p>
-                    <Button variant="outline" size="sm">
-                      <Upload className="w-4 h-4 mr-2" />
-                      Chọn ảnh
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/gif,video/mp4,video/mov"
+                      multiple
+                      onChange={handleMediaUpload}
+                      className="hidden"
+                      id="media-upload"
+                    />
+                    <Button variant="outline" size="sm" asChild>
+                      <label htmlFor="media-upload">
+                        <Upload className="w-4 h-4 mr-2" />
+                        Chọn ảnh hoặc video
+                      </label>
                     </Button>
                   </div>
-                  
-                  {images.length > 0 && (
+
+                  {media.length > 0 && (
                     <div className="grid grid-cols-3 gap-2 mt-4">
-                      {images.map((image, index) => (
+                      {media.map((item, index) => (
                         <div key={index} className="relative group">
-                          <img 
-                            src={image} 
-                            alt={`Preview ${index + 1}`}
-                            className="w-full h-20 object-cover rounded-lg"
-                          />
+                          {item.type === "image" ? (
+                            <img
+                              src={item.url}
+                              alt={`Preview ${index + 1}`}
+                              className="w-full h-20 object-cover rounded-lg"
+                            />
+                          ) : (
+                            <video
+                              src={item.url}
+                              controls
+                              className="w-full h-20 object-cover rounded-lg"
+                            />
+                          )}
                           <Button
                             variant="destructive"
                             size="sm"
                             className="absolute -top-2 -right-2 w-6 h-6 rounded-full p-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                            onClick={() => setImages(images.filter((_, i) => i !== index))}
+                            onClick={() => handleRemoveMedia(index)}
                           >
                             <X className="w-3 h-3" />
                           </Button>
@@ -220,23 +342,52 @@ export default function CreateRequest() {
                   <MapPin className="w-5 h-5 text-primary" />
                   Địa chỉ thực hiện
                 </CardTitle>
-                <CardDescription>
-                  Cung cấp địa chỉ chính xác để thợ có thể đến
-                </CardDescription>
+                <CardDescription>Cung cấp địa chỉ chính xác để thợ có thể đến</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="address">Địa chỉ chi tiết *</Label>
+                  <Label htmlFor="address">Địa chỉ chi tiết </Label>
                   <Input
                     id="address"
                     placeholder="Số nhà, tên đường, phường/xã, quận/huyện, thành phố"
-                    value={address}
-                    onChange={(e) => setAddress(e.target.value)}
+                    {...register("address")}
                     className="h-12"
                   />
+                  {errors.address && (
+                    <p className="text-sm text-red-500">{errors.address.message}</p>
+                  )}
                 </div>
-                
-                <Button variant="outline" className="w-full">
+                 <div className="space-y-2">
+                  <Label htmlFor="radius">Bán kính tìm thợ (km)</Label>
+                  <Select
+                    onValueChange={(value) => setValue("radius", parseInt(value))}
+                    defaultValue="5"
+                  >
+                    <SelectTrigger id="radius">
+                      <SelectValue placeholder="Chọn bán kính" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="5">5 km</SelectItem>
+                      <SelectItem value="10">10 km</SelectItem>
+                      <SelectItem value="15">15 km</SelectItem>
+                      <SelectItem value="20">20 km</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {errors.radius && (
+                    <p className="text-sm text-red-500">{errors.radius.message}</p>
+                  )}
+                </div>
+
+                {watch("locationLat") && watch("locationLng") && (
+                  <div className="text-sm text-muted-foreground">
+                    Vị trí: ({watch("locationLat")?.toFixed(6)}, {watch("locationLng")?.toFixed(6)})
+                  </div>
+                )}
+                {locationError && (
+                  <div className="text-sm text-red-500">{locationError}</div>
+                )}
+
+                <Button type="button" variant="outline" className="w-full" onClick={handleGetLocation}>
                   <MapPin className="w-4 h-4 mr-2" />
                   Sử dụng vị trí hiện tại
                 </Button>
@@ -247,28 +398,25 @@ export default function CreateRequest() {
             <Card className="shadow-soft">
               <CardContent className="pt-6">
                 <div className="flex flex-col sm:flex-row gap-4 justify-end">
-                  <Button 
-                    variant="outline" 
-                    onClick={() => navigate('/')}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => navigate("/")}
                     className="sm:w-auto"
                   >
                     Huỷ bỏ
                   </Button>
-                  <Button 
-                    onClick={handleSubmit}
-                    disabled={!selectedService || !description || !address || isSubmitting}
-                    className="sm:w-auto"
-                  >
+                  <Button type="submit" disabled={isSubmitting} className="sm:w-auto">
                     {isSubmitting ? "Đang gửi..." : "Gửi yêu cầu"}
                   </Button>
                 </div>
-                
+
                 <p className="text-sm text-muted-foreground mt-4 text-center">
                   Sau khi gửi yêu cầu, hệ thống sẽ tự động tìm thợ phù hợp trong khu vực của bạn
                 </p>
               </CardContent>
             </Card>
-          </div>
+          </form>
         </div>
       </div>
     </div>

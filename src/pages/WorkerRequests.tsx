@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { MapPin, Clock, Filter, Search, Eye } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,9 +9,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import Navigation from "@/components/Navigation";
+import { Client } from "@stomp/stompjs";
+import { jobService } from "@/services/jobService";
 
 const WorkerRequests = () => {
-  const [selectedService, setSelectedService] = useState("all");
+  const [requests, setRequests] = useState([]);
   const [selectedDistance, setSelectedDistance] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false);
@@ -19,78 +21,95 @@ const WorkerRequests = () => {
   const [quoteData, setQuoteData] = useState({
     amount: "",
     estimatedTime: "",
-    note: ""
+    note: "",
   });
 
-  const services = [
-    "Sửa điện",
-    "Sửa nước",
-    "Vệ sinh điều hòa",
-    "Sửa máy giặt",
-    "Thông tắc cống",
-    "Lắp đặt thiết bị",
-    "Sơn nhà",
-    "Khác"
-  ];
+  // Worker ID (giả định, thay bằng ID thực từ context hoặc auth)
+  const workerId = "defbd834-8af8-42d2-9a8c-74d001327505";
 
-  const requests = [
-    {
-      id: 1,
-      service: "Sửa điện",
-      description: "Mất điện toàn bộ tầng 2, cần thợ kiểm tra và sửa chữa khẩn cấp",
-      customer: "Anh Minh",
-      location: "123 Nguyễn Trãi, Quận 1, TP.HCM",
-      distance: "0.8km",
-      time: "10 phút trước",
-      urgent: true,
-      budget: "200,000 - 500,000đ",
-      images: 2
-    },
-    {
-      id: 2,
-      service: "Sửa nước",
-      description: "Vòi nước bể rửa chén bị rò rỉ, nước chảy liên tục",
-      customer: "Chị Lan",
-      location: "456 Lê Lợi, Quận 3, TP.HCM",
-      distance: "1.5km",
-      time: "25 phút trước",
-      urgent: false,
-      budget: "100,000 - 300,000đ",
-      images: 1
-    },
-    {
-      id: 3,
-      service: "Vệ sinh điều hòa",
-      description: "Điều hòa chạy không mát, có mùi hôi, cần vệ sinh sâu",
-      customer: "Anh Tuấn",
-      location: "789 Võ Văn Tần, Quận 7, TP.HCM",
-      distance: "2.1km",
-      time: "1 giờ trước",
-      urgent: false,
-      budget: "200,000 - 400,000đ",
-      images: 0
-    },
-    {
-      id: 4,
-      service: "Sửa máy giặt",
-      description: "Máy giặt không vắt được, kêu to khi hoạt động",
-      customer: "Chị Hoa",
-      location: "321 Hai Bà Trưng, Quận 1, TP.HCM",
-      distance: "0.5km",
-      time: "2 giờ trước",
-      urgent: false,
-      budget: "150,000 - 350,000đ",
-      images: 3
-    }
-  ];
+  // Lấy dữ liệu từ API
+  useEffect(() => {
+    const fetchRequests = async () => {
+      try {
+        const response = await jobService.getJobMatchesByWorker({
+          workerId,
+          pageSize: 100,
+          pageNumber: 0,
+        });
+        const data = response.data.content || [];
+        setRequests(data);
+      } catch (error) {
+        console.error("Lỗi:", error.message);
+      }
+    };
 
-  const filteredRequests = requests.filter((request) => {
-    const matchesService = selectedService === "all" || request.service === selectedService;
+    fetchRequests();
+  }, [workerId]);
+
+  // Thiết lập WebSocket với STOMP
+useEffect(() => {
+  const client = new Client({
+    brokerURL: "ws://192.168.1.154:8080/job-here/ws", // URL WebSocket đã đúng
+    reconnectDelay: 5000,
+    heartbeatIncoming: 4000,
+    heartbeatOutgoing: 4000,
+    debug: (str) => console.log("STOMP Debug:", str), // Debug STOMP
+  });
+
+  // Tạo đối tượng Audio để phát âm thanh
+  const notificationSound = new Audio("/audio/thong-bao-nhan-don.mp3");
+
+  client.onConnect = () => {
+    console.log("Đã kết nối WebSocket");
+    const topic = `/topic/job-notifications/${workerId}`;
+    console.log("Subscribe topic:", topic);
+    client.subscribe(topic, (message) => {
+      try {
+        const newRequest = JSON.parse(message.body);
+        console.log("Nhận được đơn hàng mới:", newRequest); // Debug dữ liệu
+        setRequests((prev) => [newRequest, ...prev]); // Thêm đơn hàng mới
+        // Phát âm thanh thông báo
+        notificationSound.play().catch((error) => {
+          console.error("Lỗi khi phát âm thanh thông báo:", error);
+        });
+      } catch (error) {
+        console.error("Lỗi khi parse thông điệp WebSocket:", error);
+      }
+    });
+  };
+
+  client.onStompError = (frame) => {
+    console.error("Lỗi STOMP:", frame);
+  };
+
+  client.onWebSocketError = (error) => {
+    console.error("Lỗi WebSocket:", error);
+  };
+
+  client.activate();
+
+  // Cleanup khi component unmount
+  return () => {
+    client.deactivate();
+    console.log("Đã ngắt kết nối WebSocket");
+  };
+}, [workerId]);
+
+
+
+  // Logic lọc (cập nhật để dùng customerName và status thay vì service)
+  const filteredRequests = requests?.filter((request) => {
+    const matchesDistance =
+      selectedDistance === "all" ||
+      (selectedDistance === "1km" && request.radius <= 1) ||
+      (selectedDistance === "2km" && request.radius <= 2) ||
+      (selectedDistance === "5km" && request.radius <= 5);
     const matchesSearch =
       request.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      request.customer.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesService && matchesSearch;
+      request.customerName.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesDistance && matchesSearch;
   });
+
 
   const handleOpenQuoteModal = (requestId) => {
     setSelectedRequestId(requestId);
@@ -114,21 +133,16 @@ const WorkerRequests = () => {
       return;
     }
 
-    // Giả lập gửi báo giá (thay bằng gọi API thực tế nếu có)
     try {
-      console.log("Gửi báo giá cho yêu cầu ID:", selectedRequestId, quoteData);
-      // Ví dụ gọi API:
-      /*
-      await fetch('/api/quotes', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      await fetch("/api/quotes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           requestId: selectedRequestId,
-          workerId: 1, // Giả định ID thợ
-          ...quoteData
-        })
+          workerId,
+          ...quoteData,
+        }),
       });
-      */
       alert("Báo giá đã được gửi!");
       handleCloseQuoteModal();
     } catch (error) {
@@ -156,7 +170,7 @@ const WorkerRequests = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-medium mb-2 block">Tìm kiếm</label>
                 <div className="relative">
@@ -168,20 +182,6 @@ const WorkerRequests = () => {
                     className="pl-10"
                   />
                 </div>
-              </div>
-              <div>
-                <label className="text-sm font-medium mb-2 block">Dịch vụ</label>
-                <Select value={selectedService} onValueChange={setSelectedService}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Chọn dịch vụ" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Tất cả dịch vụ</SelectItem>
-                    {services.map((service) => (
-                      <SelectItem key={service} value={service}>{service}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
               </div>
               <div>
                 <label className="text-sm font-medium mb-2 block">Khoảng cách</label>
@@ -208,16 +208,18 @@ const WorkerRequests = () => {
               <CardContent className="p-6">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
-                    <h3 className="text-xl font-bold text-foreground">{request.service}</h3>
-                    {request.urgent && (
-                      <Badge className="bg-red-100 text-red-700 hover:bg-red-100">Khẩn cấp</Badge>
+                    <h3 className="text-xl font-bold text-foreground">{request.status}</h3>
+                    {request.status === "PENDING" && (
+                      <Badge className="bg-yellow-100 text-yellow-700 hover:bg-yellow-100">Chờ xử lý</Badge>
                     )}
                   </div>
                   <div className="text-right">
-                    <p className="text-sm text-muted-foreground">{request.time}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {new Date(request.matchedAt).toLocaleString("vi-VN")}
+                    </p>
                     <div className="flex items-center gap-1 text-sm text-muted-foreground mt-1">
                       <MapPin className="h-4 w-4" />
-                      {request.distance}
+                      {request.radius}km
                     </div>
                   </div>
                 </div>
@@ -227,38 +229,28 @@ const WorkerRequests = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                   <div>
                     <p className="text-sm font-medium text-foreground">Khách hàng:</p>
-                    <p className="text-sm text-muted-foreground">{request.customer}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-foreground">Ngân sách dự kiến:</p>
-                    <p className="text-sm text-primary font-semibold">{request.budget}</p>
+                    <p className="text-sm text-muted-foreground">{request.customerName}</p>
                   </div>
                 </div>
 
                 <div className="mb-4">
                   <p className="text-sm font-medium text-foreground mb-1">Địa chỉ:</p>
-                  <p className="text-sm text-muted-foreground">{request.location}</p>
+                  <p className="text-sm text-muted-foreground">{request.address}</p>
                 </div>
-
-                {request.images > 0 && (
-                  <div className="mb-4">
-                    <p className="text-sm text-muted-foreground">
-                      📷 {request.images} hình ảnh đính kèm
-                    </p>
-                  </div>
-                )}
 
                 <div className="flex gap-3">
                   <Button variant="outline" className="flex-1 md:flex-none">
                     <Eye className="w-4 h-4 mr-2" />
                     Xem chi tiết
                   </Button>
-                  <Button
-                    className="flex-1 md:flex-none"
-                    onClick={() => handleOpenQuoteModal(request.id)}
-                  >
-                    Gửi báo giá
-                  </Button>
+                  {request.status === "PENDING" && (
+                    <Button
+                      className="flex-1 md:flex-none"
+                      onClick={() => handleOpenQuoteModal(request.id)}
+                    >
+                      Gửi báo giá
+                    </Button>
+                  )}
                 </div>
               </CardContent>
             </Card>
