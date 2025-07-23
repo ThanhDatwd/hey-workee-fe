@@ -112,40 +112,40 @@ export default function MyRequests() {
     fetchRequests();
   }, []);
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background mobile-container">
       <Navigation userType="customer" />
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="mobile-container px-4 py-6">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between mb-8">
+          <div className="flex flex-col gap-4 mb-6">
             <div>
-              <h1 className="text-3xl font-bold mb-2">Yêu cầu của tôi</h1>
-              <p className="text-muted-foreground">
+              <h1 className="mobile-heading text-xl font-bold mb-2">Yêu cầu của tôi</h1>
+              <p className="text-muted-foreground text-sm">
                 Quản lý tất cả yêu cầu dịch vụ của bạn
               </p>
             </div>
-            <Link to="/create-request">
-              <Button size="lg" className="mt-4 md:mt-0">
+            <Link to="/create-request" className="w-full">
+              <Button size="lg" className="mobile-button w-full">
                 Tạo yêu cầu mới
               </Button>
             </Link>
           </div>
 
           {/* Search and Filter */}
-          <Card className="shadow-soft mb-8">
-            <CardContent className="pt-6">
-              <div className="flex flex-col md:flex-row gap-4">
+          <Card className="mobile-card shadow-soft mb-6">
+            <CardContent className="pt-4 p-4">
+              <div className="flex flex-col gap-3">
                 <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                   <Input
-                    placeholder="Tìm kiếm theo dịch vụ hoặc mô tả..."
+                    placeholder="Tìm kiếm yêu cầu..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 h-12"
+                    className="pl-10 mobile-button"
                   />
                 </div>
-                <Button variant="outline" className="h-12 px-6">
+                <Button variant="outline" className="mobile-button">
                   <Filter className="w-4 h-4 mr-2" />
                   Lọc
                 </Button>

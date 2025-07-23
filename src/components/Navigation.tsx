@@ -42,10 +42,10 @@ function Navigation({ userType }: NavigationProps) {
   return (
     <>
       {/* Mobile Navigation */}
-      <nav className="lg:hidden bg-background border-b border-border sticky top-0 z-50">
-        <div className="px-4 py-4 flex items-center justify-between">
+      <nav className="lg:hidden mobile-nav bg-background/95 backdrop-blur-lg border-b border-border sticky top-0 z-50">
+        <div className="mobile-container px-4 py-3 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-gradient-primary rounded-xl flex items-center justify-center">
               <Wrench className="w-5 h-5 text-primary-foreground" />
             </div>
             <span className="font-semibold text-lg text-foreground">
@@ -57,7 +57,7 @@ function Navigation({ userType }: NavigationProps) {
             variant="ghost" 
             size="sm"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="p-2"
+            className="mobile-button w-10 h-10 p-0"
           >
             {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </Button>
@@ -65,13 +65,13 @@ function Navigation({ userType }: NavigationProps) {
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="border-t bg-card animate-slide-up shadow-medium">
+          <div className="mobile-card border-t bg-card animate-slide-up shadow-medium">
             {menuItems.map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
                 onClick={() => setIsMenuOpen(false)}
-                className={`flex items-center gap-3 px-4 py-4 hover:bg-accent transition-colors text-base ${
+                className={`flex items-center gap-4 px-4 py-4 hover:bg-accent transition-colors text-base border-b border-border/50 last:border-0 ${
                   isActive(item.path) 
                     ? "bg-accent text-accent-foreground border-r-4 border-primary font-medium" 
                     : "text-muted-foreground"
@@ -85,12 +85,12 @@ function Navigation({ userType }: NavigationProps) {
             {!userType && (
               <div className="border-t p-4 space-y-3 bg-muted/30">
                 <Link to="/login">
-                  <Button variant="outline" className="w-full h-12 text-base font-medium">
+                  <Button variant="outline" className="w-full mobile-button text-base font-medium">
                     Đăng nhập
                   </Button>
                 </Link>
                 <Link to="/register">
-                  <Button className="w-full h-12 text-base font-medium">
+                  <Button className="w-full mobile-button text-base font-medium">
                     Đăng ký
                   </Button>
                 </Link>

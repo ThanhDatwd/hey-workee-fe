@@ -128,11 +128,60 @@ All colors MUST be HSL.
     touch-action: manipulation;
   }
   
-  /* Mobile-first touch targets */
+  /* Mobile app styles */
   @media (max-width: 1024px) {
+    /* Touch-friendly targets */
     button, a, input, select, textarea {
-      min-height: 44px;
-      min-width: 44px;
+      min-height: 48px;
+      min-width: 48px;
+    }
+    
+    /* Mobile app container */
+    .mobile-container {
+      max-width: 100vw !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      border-radius: 0 !important;
+    }
+    
+    /* Full-width mobile cards */
+    .mobile-card {
+      border-radius: 0 !important;
+      border-left: 0 !important;
+      border-right: 0 !important;
+      box-shadow: none !important;
+      border-bottom: 1px solid hsl(var(--border)) !important;
+    }
+    
+    /* Mobile section spacing */
+    .mobile-section {
+      padding: 1rem !important;
+      margin: 0 !important;
+    }
+    
+    /* Mobile typography */
+    .mobile-heading {
+      font-size: 1.5rem !important;
+      font-weight: 600 !important;
+      line-height: 1.4 !important;
+    }
+    
+    /* Mobile buttons */
+    .mobile-button {
+      height: 48px !important;
+      border-radius: 12px !important;
+      font-weight: 500 !important;
+      font-size: 1rem !important;
+    }
+    
+    /* Mobile navigation */
+    .mobile-nav {
+      position: sticky !important;
+      top: 0 !important;
+      z-index: 50 !important;
+      background: rgba(255, 255, 255, 0.95) !important;
+      backdrop-filter: blur(10px) !important;
+      border-bottom: 1px solid hsl(var(--border)) !important;
     }
   }
 }

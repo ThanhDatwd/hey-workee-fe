@@ -13,32 +13,32 @@ export default function Login() {
   const [loginMethod, setLoginMethod] = useState<'email' | 'phone'>('email');
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background mobile-container">
       <Navigation />
       
-      <div className="container mx-auto px-4 py-16 flex items-center justify-center">
+      <div className="mobile-container px-4 py-8 flex items-center justify-center">
         <div className="w-full max-w-md">
-          <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <Wrench className="w-8 h-8 text-primary-foreground" />
+          <div className="text-center mb-6">
+            <div className="w-14 h-14 bg-gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <Wrench className="w-7 h-7 text-primary-foreground" />
             </div>
-            <h1 className="text-3xl font-bold">Đăng nhập</h1>
-            <p className="text-muted-foreground mt-2">
+            <h1 className="mobile-heading text-2xl font-bold">Đăng nhập</h1>
+            <p className="text-muted-foreground mt-2 text-sm">
               Chào mừng trở lại với Thợ Ơiii
             </p>
           </div>
 
-          <Card className="shadow-medium">
-            <CardHeader className="text-center pb-2">
-              <CardTitle>Đăng nhập vào tài khoản</CardTitle>
-              <CardDescription>
+          <Card className="mobile-card shadow-medium">
+            <CardHeader className="text-center pb-2 p-4">
+              <CardTitle className="text-lg">Đăng nhập vào tài khoản</CardTitle>
+              <CardDescription className="text-sm">
                 Sử dụng email hoặc số điện thoại để đăng nhập
               </CardDescription>
             </CardHeader>
             
-            <CardContent className="space-y-6">
+            <CardContent className="space-y-5 p-4">
               <Tabs value={loginMethod} onValueChange={(value) => setLoginMethod(value as 'email' | 'phone')}>
-                <TabsList className="grid w-full grid-cols-2">
+                <TabsList className="grid w-full grid-cols-2 mobile-button">
                   <TabsTrigger value="email" className="flex items-center gap-2">
                     <Mail className="w-4 h-4" />
                     Email
@@ -49,39 +49,39 @@ export default function Login() {
                   </TabsTrigger>
                 </TabsList>
                 
-                <TabsContent value="email" className="space-y-4 mt-6">
+                <TabsContent value="email" className="space-y-4 mt-4">
                   <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
+                    <Label htmlFor="email" className="text-sm font-medium">Email</Label>
                     <Input
                       id="email"
                       type="email"
                       placeholder="Nhập email của bạn"
-                      className="h-12"
+                      className="mobile-button"
                     />
                   </div>
                 </TabsContent>
                 
-                <TabsContent value="phone" className="space-y-4 mt-6">
+                <TabsContent value="phone" className="space-y-4 mt-4">
                   <div className="space-y-2">
-                    <Label htmlFor="phone">Số điện thoại</Label>
+                    <Label htmlFor="phone" className="text-sm font-medium">Số điện thoại</Label>
                     <Input
                       id="phone"
                       type="tel"
                       placeholder="Nhập số điện thoại"
-                      className="h-12"
+                      className="mobile-button"
                     />
                   </div>
                 </TabsContent>
               </Tabs>
 
               <div className="space-y-2">
-                <Label htmlFor="password">Mật khẩu</Label>
+                <Label htmlFor="password" className="text-sm font-medium">Mật khẩu</Label>
                 <div className="relative">
                   <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
                     placeholder="Nhập mật khẩu"
-                    className="h-12 pr-10"
+                    className="mobile-button pr-12"
                   />
                   <Button
                     type="button"
@@ -118,7 +118,7 @@ export default function Login() {
                 </Link>
               </div>
 
-              <Button className="w-full h-12 text-base">
+              <Button className="w-full mobile-button text-base">
                 Đăng nhập
               </Button>
 
@@ -134,8 +134,8 @@ export default function Login() {
               </div>
 
               <div className="text-center">
-                <span className="text-muted-foreground">Chưa có tài khoản? </span>
-                <Link to="/register" className="text-primary hover:underline font-medium">
+                <span className="text-muted-foreground text-sm">Chưa có tài khoản? </span>
+                <Link to="/register" className="text-primary hover:underline font-medium text-sm">
                   Đăng ký ngay
                 </Link>
               </div>

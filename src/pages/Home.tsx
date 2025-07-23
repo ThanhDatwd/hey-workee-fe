@@ -67,29 +67,29 @@ const features = [
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background mobile-container">
       <Navigation />
       
       {/* Hero Section */}
-      <section className="bg-gradient-primary text-primary-foreground py-16 lg:py-24">
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="text-4xl lg:text-6xl font-bold mb-6 animate-fade-in">
+      <section className="bg-gradient-primary text-primary-foreground py-12 lg:py-24 mobile-section">
+        <div className="mobile-container px-4 text-center">
+          <h1 className="mobile-heading text-2xl lg:text-6xl font-bold mb-4 animate-fade-in">
             Tìm thợ sửa chữa
             <br />
             <span className="text-blue-100">gần bạn nhất</span>
           </h1>
-          <p className="text-xl lg:text-2xl mb-8 text-blue-100 max-w-2xl mx-auto">
+          <p className="text-base lg:text-2xl mb-6 text-blue-100 max-w-2xl mx-auto">
             Kết nối nhanh chóng với thợ có kỹ năng phù hợp trong khu vực của bạn
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/create-request">
-              <Button size="lg" variant="secondary" className="text-lg px-8 py-3">
+          <div className="flex flex-col gap-3 justify-center">
+            <Link to="/create-request" className="w-full">
+              <Button size="lg" variant="secondary" className="mobile-button w-full text-lg px-8">
                 Tạo yêu cầu ngay
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
             </Link>
-            <Link to="/register?type=worker">
-              <Button size="lg" variant="outline" className="text-lg px-8 py-3 border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary">
+            <Link to="/register?type=worker" className="w-full">
+              <Button size="lg" variant="outline" className="mobile-button w-full text-lg px-8 border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary">
                 Trở thành thợ
               </Button>
             </Link>
@@ -98,28 +98,28 @@ export default function Home() {
       </section>
 
       {/* Services Section */}
-      <section className="py-16 lg:py-24">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl lg:text-4xl font-bold mb-4">
+      <section className="py-8 lg:py-24 mobile-section">
+        <div className="mobile-container px-4">
+          <div className="text-center mb-8">
+            <h2 className="mobile-heading text-xl lg:text-4xl font-bold mb-3">
               Dịch vụ phổ biến
             </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-base text-muted-foreground max-w-2xl mx-auto">
               Chúng tôi kết nối bạn với các thợ chuyên nghiệp trong nhiều lĩnh vực
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-6">
             {services.map((service, index) => (
-              <Card key={index} className="hover:shadow-medium transition-shadow cursor-pointer">
-                <CardHeader className="text-center">
-                  <div className={`w-16 h-16 rounded-2xl ${service.color} flex items-center justify-center mx-auto mb-4`}>
-                    <service.icon className="w-8 h-8" />
+              <Card key={index} className="mobile-card hover:shadow-medium transition-shadow cursor-pointer">
+                <CardHeader className="text-center p-4">
+                  <div className={`w-12 h-12 lg:w-16 lg:h-16 rounded-xl ${service.color} flex items-center justify-center mx-auto mb-3`}>
+                    <service.icon className="w-6 h-6 lg:w-8 lg:h-8" />
                   </div>
-                  <CardTitle className="text-xl">{service.title}</CardTitle>
+                  <CardTitle className="text-sm lg:text-xl">{service.title}</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <CardDescription className="text-center">
+                <CardContent className="p-4 pt-0">
+                  <CardDescription className="text-center text-xs lg:text-sm">
                     {service.description}
                   </CardDescription>
                 </CardContent>
