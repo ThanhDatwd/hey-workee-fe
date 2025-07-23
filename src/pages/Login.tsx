@@ -14,7 +14,7 @@ export default function Login() {
 
   return (
     <div className="min-h-screen bg-background mobile-container">
-      <Navigation />
+      <div className="mobile-content">
       
       <div className="mobile-container px-4 py-8 flex items-center justify-center">
         <div className="w-full max-w-md">
@@ -143,6 +143,8 @@ export default function Login() {
           </Card>
         </div>
       </div>
+      </div>
+      <Navigation />
     </div>
   );
 }

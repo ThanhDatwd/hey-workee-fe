@@ -68,7 +68,7 @@ const features = [
 export default function Home() {
   return (
     <div className="min-h-screen bg-background mobile-container">
-      <Navigation />
+      <div className="mobile-content">
       
       {/* Hero Section */}
       <section className="bg-gradient-primary text-primary-foreground py-12 lg:py-24 mobile-section">
@@ -198,6 +198,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+      </div>
+      <Navigation />
     </div>
   );
 }

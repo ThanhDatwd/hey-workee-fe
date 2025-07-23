@@ -113,7 +113,7 @@ export default function MyRequests() {
   }, []);
   return (
     <div className="min-h-screen bg-background mobile-container">
-      <Navigation userType="customer" />
+      <div className="mobile-content">
 
       <div className="mobile-container px-4 py-6">
         <div className="max-w-6xl mx-auto">
@@ -354,6 +354,8 @@ export default function MyRequests() {
           </Tabs>
         </div>
       </div>
+      </div>
+      <Navigation userType="customer" />
     </div>
   );
 }

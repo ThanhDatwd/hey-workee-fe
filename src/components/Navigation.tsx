@@ -41,61 +41,73 @@ function Navigation({ userType }: NavigationProps) {
 
   return (
     <>
-      {/* Mobile Navigation */}
-      <nav className="lg:hidden mobile-nav bg-background/95 backdrop-blur-lg border-b border-border sticky top-0 z-50">
-        <div className="mobile-container px-4 py-3 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-primary rounded-xl flex items-center justify-center">
-              <Wrench className="w-5 h-5 text-primary-foreground" />
-            </div>
-            <span className="font-semibold text-lg text-foreground">
-              Thợ Ơiii
-            </span>
-          </Link>
-          
-          <Button 
-            variant="ghost" 
-            size="sm"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="mobile-button w-10 h-10 p-0"
-          >
-            {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </Button>
-        </div>
-
-        {/* Mobile Menu */}
-        {isMenuOpen && (
-          <div className="mobile-card border-t bg-card animate-slide-up shadow-medium">
-            {menuItems.map((item) => (
+      {/* Mobile Bottom Navigation */}
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-lg border-t border-border">
+        <div className="mobile-container px-2 py-2">
+          <div className="flex items-center justify-around">
+            {menuItems.slice(0, 4).map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
-                onClick={() => setIsMenuOpen(false)}
-                className={`flex items-center gap-4 px-4 py-4 hover:bg-accent transition-colors text-base border-b border-border/50 last:border-0 ${
+                className={`flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-colors min-w-[60px] ${
                   isActive(item.path) 
-                    ? "bg-accent text-accent-foreground border-r-4 border-primary font-medium" 
-                    : "text-muted-foreground"
+                    ? "bg-primary text-primary-foreground" 
+                    : "text-muted-foreground hover:text-foreground"
                 }`}
               >
-                <item.icon className="w-6 h-6" />
-                <span className="font-medium">{item.label}</span>
+                <item.icon className="w-5 h-5" />
+                <span className="text-xs font-medium">{item.label}</span>
               </Link>
             ))}
             
             {!userType && (
-              <div className="border-t p-4 space-y-3 bg-muted/30">
-                <Link to="/login">
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="flex flex-col items-center gap-1 px-3 py-2 rounded-xl min-w-[60px]"
+              >
+                <Menu className="w-5 h-5" />
+                <span className="text-xs font-medium">Menu</span>
+              </Button>
+            )}
+          </div>
+        </div>
+
+        {/* Mobile Menu Overlay */}
+        {isMenuOpen && !userType && (
+          <div className="fixed inset-0 bg-black/50 z-40" onClick={() => setIsMenuOpen(false)}>
+            <div className="absolute bottom-0 left-0 right-0 bg-background rounded-t-2xl p-6 animate-slide-up">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 bg-gradient-primary rounded-xl flex items-center justify-center">
+                    <Wrench className="w-5 h-5 text-primary-foreground" />
+                  </div>
+                  <span className="font-semibold text-lg">Thợ Ơiii</span>
+                </div>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="w-8 h-8 p-0"
+                >
+                  <X className="w-5 h-5" />
+                </Button>
+              </div>
+              
+              <div className="space-y-3">
+                <Link to="/login" onClick={() => setIsMenuOpen(false)}>
                   <Button variant="outline" className="w-full mobile-button text-base font-medium">
                     Đăng nhập
                   </Button>
                 </Link>
-                <Link to="/register">
+                <Link to="/register" onClick={() => setIsMenuOpen(false)}>
                   <Button className="w-full mobile-button text-base font-medium">
                     Đăng ký
                   </Button>
                 </Link>
               </div>
-            )}
+            </div>
           </div>
         )}
       </nav>

@@ -144,6 +144,11 @@ All colors MUST be HSL.
       border-radius: 0 !important;
     }
     
+    /* Mobile body with bottom padding for navigation */
+    body {
+      padding-bottom: 80px;
+    }
+    
     /* Full-width mobile cards */
     .mobile-card {
       border-radius: 0 !important;
@@ -174,14 +179,9 @@ All colors MUST be HSL.
       font-size: 1rem !important;
     }
     
-    /* Mobile navigation */
-    .mobile-nav {
-      position: sticky !important;
-      top: 0 !important;
-      z-index: 50 !important;
-      background: rgba(255, 255, 255, 0.95) !important;
-      backdrop-filter: blur(10px) !important;
-      border-bottom: 1px solid hsl(var(--border)) !important;
+    /* Bottom navigation safe area */
+    .mobile-content {
+      padding-bottom: 90px !important;
     }
   }
 }
